@@ -1,36 +1,34 @@
-const apiKey = 'YOUR_API_KEY';  // Замініть на ваш API ключ для доступу до штучного інтелекту
+const apiKey = 'YOUR_API_KEY';  // Замініть на реальний API ключ
 
-// Початок створення дизайну
 function startDesign(roomType) {
-    document.getElementById('room-selection').style.display = 'none';
+    document.getElementById('start').style.display = 'none';
     document.getElementById('design-form').style.display = 'block';
 }
 
-// Генерація дизайну за допомогою AI
 async function generateDesign() {
-    const roomType = document.querySelector('button[style="display: inline-block;"]').innerText.toLowerCase();
     const style = document.getElementById('style').value;
     const colorScheme = document.getElementById('colorScheme').value;
+    const fileInput = document.getElementById('upload').files[0];
+
+    const formData = new FormData();
+    formData.append("style", style);
+    formData.append("colorScheme", colorScheme);
+    if (fileInput) {
+        formData.append("image", fileInput);
+    }
 
     const response = await fetch('https://api.example.com/generate-design', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify({
-            roomType: roomType,
-            style: style,
-            colorScheme: colorScheme
-        })
+        body: formData
     });
 
     const data = await response.json();
-
-    // Виведення результатів на сторінку
-    document.getElementById('design-results').innerHTML = `
-        <img src="${data.imageUrl}" alt="Generated Design" />
+    document.getElementById('design-output').innerHTML = `
+        <img src="${data.imageUrl}" alt="Генерований дизайн">
         <p>${data.description}</p>
     `;
-    document.getElementById('suggestions').style.display = 'block';
+    document.getElementById('results').style.display = 'block';
 }
