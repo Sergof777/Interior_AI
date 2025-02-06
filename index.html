@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Самонавчальна Нейромережа</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Самонавчальна нейромережа</h1>
+    
+    <div id="train-section">
+        <h2>Навчання</h2>
+        <input type="number" id="inputX" placeholder="Введіть X">
+        <input type="number" id="inputY" placeholder="Введіть Y">
+        <button onclick="trainModel()">Навчити</button>
+    </div>
+
+    <div id="predict-section">
+        <h2>Прогноз</h2>
+        <input type="number" id="predictX" placeholder="Введіть X">
+        <button onclick="predict()">Прогнозувати</button>
+        <p id="result"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
