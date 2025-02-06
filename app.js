@@ -1,34 +1,25 @@
-const apiKey = 'YOUR_API_KEY';  // Замініть на реальний API ключ
+document.getElementById('designForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-function startDesign(roomType) {
-    document.getElementById('start').style.display = 'none';
-    document.getElementById('design-form').style.display = 'block';
-}
+    let style = document.getElementById('style').value;
+    let color = document.getElementById('color').value;
+    let file = document.getElementById('imageUpload').files[0];
 
-async function generateDesign() {
-    const style = document.getElementById('style').value;
-    const colorScheme = document.getElementById('colorScheme').value;
-    const fileInput = document.getElementById('upload').files[0];
+    let formData = new FormData();
+    formData.append('style', style);
+    formData.append('color', color);
+    formData.append('image', file);
 
-    const formData = new FormData();
-    formData.append("style", style);
-    formData.append("colorScheme", colorScheme);
-    if (fileInput) {
-        formData.append("image", fileInput);
-    }
-
-    const response = await fetch('https://api.example.com/generate-design', {
+    const response = await fetch('/generate-design', {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`
-        },
         body: formData
     });
 
     const data = await response.json();
-    document.getElementById('design-output').innerHTML = `
-        <img src="${data.imageUrl}" alt="Генерований дизайн">
-        <p>${data.description}</p>
-    `;
-    document.getElementById('results').style.display = 'block';
-}
+
+    if (data.success) {
+        document.getElementById('designResult').innerHTML = `<img src="${data.imageUrl}" alt="AI Дизайн">`;
+    } else {
+        alert('Помилка генерації дизайну');
+    }
+});
