@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Штучний Інтелект для Дизайну Інтер'єрів</title>
+    <title>AI Дизайн Інтер'єрів</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Підбір дизайну інтер'єрів за допомогою Штучного Інтелекту</h1>
+        <h1>Штучний Інтелект для Дизайну Інтер'єрів</h1>
     </header>
 
     <div class="container">
-        <section id="room-selection">
-            <h2>Оберіть тип приміщення</h2>
+        <section id="start">
+            <h2>Оберіть приміщення</h2>
             <button onclick="startDesign('living-room')">Вітальня</button>
             <button onclick="startDesign('bedroom')">Спальня</button>
             <button onclick="startDesign('kitchen')">Кухня</button>
         </section>
 
         <section id="design-form" style="display: none;">
-            <h2>Створіть свій дизайн</h2>
+            <h2>Налаштуйте свій дизайн</h2>
             <label for="style">Стиль:</label>
             <select id="style">
                 <option value="modern">Модерн</option>
@@ -35,17 +35,20 @@
                 <option value="neutral">Нейтральна</option>
             </select>
 
+            <label for="upload">Завантажити власний зразок:</label>
+            <input type="file" id="upload" accept="image/*">
+
             <button onclick="generateDesign()">Генерувати дизайн</button>
         </section>
 
-        <section id="suggestions" style="display: none;">
+        <section id="results" style="display: none;">
             <h2>Ваш дизайн:</h2>
-            <div id="design-results"></div>
+            <div id="design-output"></div>
         </section>
     </div>
 
     <footer>
-        <p>© 2025 Ваш сайт дизайну інтер'єрів</p>
+        <p>© 2025 AI Дизайн Інтер'єрів</p>
     </footer>
 
     <script src="app.js"></script>
