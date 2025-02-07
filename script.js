@@ -1,57 +1,92 @@
-let model;
+const wheel = document.getElementById("wheel");
+const spinButton = document.getElementById("spinButton");
+const balanceDisplay = document.getElementById("balance");
+const messageDisplay = document.getElementById("message");
+const spinsLeftDisplay = document.getElementById("spinsLeft");
+const saveNameButton = document.getElementById("saveName");
+const playerNameInput = document.getElementById("playerName");
 
-async function createModel() {
-    model = tf.sequential();
-    model.add(tf.layers.dense({inputShape: [1], units: 8, activation: 'relu'}));
-    model.add(tf.layers.dense({units: 1}));
-    model.compile({
-        optimizer: tf.train.sgd(0.1),
-        loss: 'meanSquaredError'
-    });
+let balance = 0;
+let spinsLeft = 3;
+let playerName = "";
 
-    // Перевіряємо, чи є збережена модель
-    try {
-        const loadedModel = await tf.loadLayersModel('localstorage://my-model');
-        model = loadedModel;
-        console.log("Модель завантажена з пам'яті!");
-    } catch (error) {
-        console.log("Немає збереженої моделі, створюємо нову.");
+// Призові сектори
+const sectors = [0.001, 0.01, 0.05, 0.1, 0.2, 0.5, 1, 1.5, "x2"];
+
+// Завантаження даних гравця
+function loadPlayerData() {
+    playerName = localStorage.getItem("playerName") || "";
+    balance = parseFloat(localStorage.getItem("balance")) || 0;
+    spinsLeft = parseInt(localStorage.getItem("spinsLeft")) || 3;
+
+    playerNameInput.value = playerName;
+    balanceDisplay.innerText = `Balance: ${balance.toFixed(3)} SVX`;
+    spinsLeftDisplay.innerText = `Spins left: ${spinsLeft}`;
+}
+
+// Збереження даних гравця
+function savePlayerData() {
+    localStorage.setItem("playerName", playerName);
+    localStorage.setItem("balance", balance);
+    localStorage.setItem("spinsLeft", spinsLeft);
+}
+
+// Оновлення залишку прокрутів
+function checkSpinLimit() {
+    if (spinsLeft === 0) {
+        spinButton.disabled = true;
+        messageDisplay.innerText = "You have used all spins. Try again in 2 hours.";
+
+        setTimeout(() => {
+            spinsLeft = 3;
+            spinButton.disabled = false;
+            spinsLeftDisplay.innerText = `Spins left: ${spinsLeft}`;
+            savePlayerData();
+        }, 2 * 60 * 60 * 1000); // 2 години
     }
 }
 
-async function trainModel() {
-    const inputX = parseFloat(document.getElementById("inputX").value);
-    const inputY = parseFloat(document.getElementById("inputY").value);
-
-    if (isNaN(inputX) || isNaN(inputY)) {
-        alert("Введіть коректні числа!");
+// Обертання колеса
+function spinWheel() {
+    if (spinsLeft <= 0) {
+        messageDisplay.innerText = "No spins left!";
         return;
     }
 
-    const xs = tf.tensor2d([inputX], [1, 1]);
-    const ys = tf.tensor2d([inputY], [1, 1]);
+    const sectorIndex = Math.floor(Math.random() * sectors.length);
+    const prize = sectors[sectorIndex];
 
-    await model.fit(xs, ys, {epochs: 10});
+    const degrees = 3600 + (sectorIndex * 40); // Кут обертання
+    wheel.style.transform = `rotate(${degrees}deg)`;
 
-    // Зберігаємо модель у браузері
-    await model.save('localstorage://my-model');
+    setTimeout(() => {
+        if (prize === "x2") {
+            balance *= 2;
+            messageDisplay.innerText = `You won x2! Your balance doubled!`;
+        } else {
+            balance += prize;
+            messageDisplay.innerText = `You won ${prize} SVX!`;
+        }
 
-    alert("Навчання завершене!");
+        spinsLeft--;
+        balanceDisplay.innerText = `Balance: ${balance.toFixed(3)} SVX`;
+        spinsLeftDisplay.innerText = `Spins left: ${spinsLeft}`;
+        
+        savePlayerData();
+        checkSpinLimit();
+    }, 3000);
 }
 
-async function predict() {
-    const predictX = parseFloat(document.getElementById("predictX").value);
-
-    if (isNaN(predictX)) {
-        alert("Введіть число!");
-        return;
+// Збереження імені
+saveNameButton.addEventListener("click", () => {
+    playerName = playerNameInput.value.trim();
+    if (playerName) {
+        localStorage.setItem("playerName", playerName);
+        messageDisplay.innerText = `Welcome, ${playerName}!`;
     }
+});
 
-    const input = tf.tensor2d([predictX], [1, 1]);
-    const output = model.predict(input);
-    output.data().then(prediction => {
-        document.getElementById("result").innerText = `Прогноз: ${prediction[0].toFixed(2)}`;
-    });
-}
+spinButton.addEventListener("click", spinWheel);
 
-createModel();
+loadPlayerData();
+checkSpinLimit();
